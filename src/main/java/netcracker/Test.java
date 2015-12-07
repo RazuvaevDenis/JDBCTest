@@ -40,7 +40,6 @@ public class Test {
 				System.out.println(c_rs.getString("student_id")+" "+c_rs.getString("name")+" "+
 						c_rs.getString("surname")+" "+c_rs.getString("age")+" "+c_rs.getString("faculty"));
 			}
-			connection.close();
 		} catch (IOException e) {
 			System.err.println("Error!");
 		} catch (SQLException e) {
@@ -49,6 +48,13 @@ public class Test {
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		finally{
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}

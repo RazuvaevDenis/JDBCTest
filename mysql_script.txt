@@ -1,0 +1,39 @@
+CREATE DATABASE 'jdbc';
+
+CREATE TABLE Students(
+Student_ID int(7) NOT NULL AUTO_INCREMENT ,
+Name varchar(1000) NOT NULL,
+Surname varchar(1000) not null , 
+Age int(2) not null,
+Faculty varchar(1000) not null,
+CONSTRAINT student_id_pk PRIMARY KEY (Student_ID)
+);
+
+CREATE TABLE Lecturers(
+Lecturer_ID int(7) NOT NULL AUTO_INCREMENT ,
+Name varchar(1000) NOT NULL,
+Surname varchar(1000) not null , 
+Age int(2) not null,
+Science varchar(1000) not null,
+CONSTRAINT lecturer_id_pk PRIMARY KEY (Lecturer_ID)
+);
+
+INSERT INTO Students(name,surname,age,faculty)
+VALUES('Ivan','Ivanov',20,'CSF');
+
+
+INSERT INTO Students(name,surname,age,faculty)
+VALUES('Petr','Ivanov',20,'CSF');
+
+INSERT INTO Lecturers(name,surname,age,science)
+VALUES('Ivan','Petrovich',40,'chemistry');
+
+DELIMITER $$  
+CREATE PROCEDURE `p2` () 
+LANGUAGE SQL 
+DETERMINISTIC 
+SQL SECURITY DEFINER 
+COMMENT 'A procedure' 
+BEGIN 
+SELECT * from students where student_id=1; 
+END$$ 

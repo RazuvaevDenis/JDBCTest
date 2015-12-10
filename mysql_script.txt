@@ -28,12 +28,11 @@ VALUES('Petr','Ivanov',20,'CSF');
 INSERT INTO Lecturers(name,surname,age,science)
 VALUES('Ivan','Petrovich',40,'chemistry');
 
-DELIMITER $$  
-CREATE PROCEDURE `p2` () 
-LANGUAGE SQL 
-DETERMINISTIC 
-SQL SECURITY DEFINER 
-COMMENT 'A procedure' 
+DELIMITER $$ 
+CREATE PROCEDURE `p3` (OUT count_stud int(10)) 
 BEGIN 
-SELECT * from students where student_id=1; 
-END$$ 
+Declare z int default 0;
+select count(*) into z from students;
+set count_stud=z; 
+END $$
+

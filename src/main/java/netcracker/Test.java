@@ -1,61 +1,65 @@
 package netcracker;
 
 import com.mysql.jdbc.PreparedStatement;
+import com.sun.org.apache.bcel.internal.generic.Type;
+import org.apache.log4j.Level;
+import org.apache.log4j.xml.DOMConfigurator;
+import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
 
 
 public class Test {
+
+	public static void SimpleStatement(Connection connection, Statement st, Logger log) throws SQLException {
+		ResultSet rs=st.executeQuery("select * from students");
+		while (rs.next()) {
+			log.log(Level.INFO,rs.getString("student_id")+" "+rs.getString("name")+" "+
+					rs.getString("surname")+" "+rs.getString("age")+" "+rs.getString("faculty"));
+		}
+	}
+
+	public static void SimplePreparedStatement(Connection connection, java.sql.PreparedStatement pst, Logger log) throws SQLException {
+		ResultSet pst_rs=pst.executeQuery();
+		while(pst_rs.next()){
+			log.log(Level.INFO,pst_rs.getString("lecturer_id")+" "+pst_rs.getString("name")+" "+
+					pst_rs.getString("surname")+" "+pst_rs.getString("age")+" "+pst_rs.getString("science"));
+		}
+	}
+
+	public static void SimpleCallableStatement(Connection connection, CallableStatement cst, Logger log) throws SQLException {
+		cst.registerOutParameter("count_stud",Types.INTEGER);
+		cst.execute();
+		log.log(Level.INFO,"Count of student = " + cst.getInt("count_stud"));
+	}
+
 	public static void main(String[] args) {
 		String url = "jdbc:mysql://localhost:3306/jdbc";
-		FileInputStream fis;
 		Properties property = new Properties();
-		Connection connection = null;
-		try {
-			fis = new FileInputStream("src/main/resources/jdbc.properties");
+		DOMConfigurator.configure("src/main/resources/log4j.xml");
+		Logger log=Logger.getLogger(Test.class);
+		try (FileInputStream fis = new FileInputStream("src/main/resources/jdbc.properties")){
 			property.load(fis);
-			Class.forName("com.mysql.jdbc.Driver");
-			connection = DriverManager.getConnection(url, property);
-			Statement st=connection.createStatement();
-			java.sql.PreparedStatement pst=connection.prepareStatement("select * from lecturers where lecturer_id = ?");
-			pst.setInt(1,1);
-			CallableStatement cst=connection.prepareCall("{call p2}");
-			ResultSet pst_rs=pst.executeQuery();
-			ResultSet rs=st.executeQuery("select * from students");
-			ResultSet c_rs=cst.executeQuery();
-			while (rs.next()) {
-                System.out.println(rs.getString("student_id")+" "+rs.getString("name")+" "+
-                		rs.getString("surname")+" "+rs.getString("age")+" "+rs.getString("faculty"));
-            }
-			System.out.println("---------------------------------");
-			while(pst_rs.next()){
-				System.out.println(pst_rs.getString("lecturer_id")+" "+pst_rs.getString("name")+" "+
-						pst_rs.getString("surname")+" "+pst_rs.getString("age")+" "+pst_rs.getString("science"));
-			}
-			System.out.println("---------------Callable Statement---------------------");
-			while(c_rs.next()){
-				System.out.println(c_rs.getString("student_id")+" "+c_rs.getString("name")+" "+
-						c_rs.getString("surname")+" "+c_rs.getString("age")+" "+c_rs.getString("faculty"));
-			}
 		} catch (IOException e) {
-			System.err.println("Error!");
+			log.log(Level.ERROR,"Error");
+		}
+		try (Connection connection = DriverManager.getConnection(url, property);
+			 Statement st=connection.createStatement();
+			 CallableStatement cst=connection.prepareCall("{call p3(?)}");
+			 java.sql.PreparedStatement pst=connection.prepareStatement("select * from lecturers where lecturer_id = ?")) {
+			Class.forName("com.mysql.jdbc.Driver");
+			pst.setInt(1,1);
+			SimpleStatement(connection,st,log);
+			SimplePreparedStatement(connection,pst,log);
+			SimpleCallableStatement(connection,cst,log);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.ERROR,"Error");
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.ERROR,"Error");
 		}
-		finally{
-			try {
-				connection.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-
 	}
 }

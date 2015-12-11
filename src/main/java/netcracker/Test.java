@@ -15,23 +15,33 @@ import java.util.Properties;
 
 public class Test {
 
-	public static void SimpleStatement(Connection connection, Statement st, Logger log) throws SQLException {
-		ResultSet rs=st.executeQuery("select * from students");
-		while (rs.next()) {
-			log.log(Level.INFO,rs.getString("student_id")+" "+rs.getString("name")+" "+
-					rs.getString("surname")+" "+rs.getString("age")+" "+rs.getString("faculty"));
+	private static final Logger log=Logger.getLogger(Test.class.getName());
+
+	public static void SimpleStatement(Statement st, Logger log){
+		try(ResultSet rs=st.executeQuery("select * from students")) {
+			while (rs.next()) {
+				log.log(Level.INFO, rs.getString("student_id") + " " + rs.getString("name") + " " +
+						rs.getString("surname") + " " + rs.getString("age") + " " + rs.getString("faculty"));
+			}
+		}
+		catch(SQLException e){
+			log.log(Level.ERROR,"Error with error code" +  e.getErrorCode()+"." + e.getMessage());
 		}
 	}
 
-	public static void SimplePreparedStatement(Connection connection, java.sql.PreparedStatement pst, Logger log) throws SQLException {
-		ResultSet pst_rs=pst.executeQuery();
-		while(pst_rs.next()){
-			log.log(Level.INFO,pst_rs.getString("lecturer_id")+" "+pst_rs.getString("name")+" "+
-					pst_rs.getString("surname")+" "+pst_rs.getString("age")+" "+pst_rs.getString("science"));
+	public static void SimplePreparedStatement(java.sql.PreparedStatement pst, Logger log){
+		try(ResultSet pst_rs=pst.executeQuery()) {
+			while (pst_rs.next()) {
+				log.log(Level.INFO, pst_rs.getString("lecturer_id") + " " + pst_rs.getString("name") + " " +
+						pst_rs.getString("surname") + " " + pst_rs.getString("age") + " " + pst_rs.getString("science"));
+			}
+		}
+		catch(SQLException e){
+			log.log(Level.ERROR,"Error with error code" +  e.getErrorCode()+"." + e.getMessage());
 		}
 	}
 
-	public static void SimpleCallableStatement(Connection connection, CallableStatement cst, Logger log) throws SQLException {
+	public static void SimpleCallableStatement(CallableStatement cst, Logger log) throws SQLException {
 		cst.registerOutParameter("count_stud",Types.INTEGER);
 		cst.execute();
 		log.log(Level.INFO,"Count of student = " + cst.getInt("count_stud"));
@@ -40,8 +50,6 @@ public class Test {
 	public static void main(String[] args) {
 		String url = "jdbc:mysql://localhost:3306/jdbc";
 		Properties property = new Properties();
-		DOMConfigurator.configure("src/main/resources/log4j.xml");
-		Logger log=Logger.getLogger(Test.class);
 		try (FileInputStream fis = new FileInputStream("src/main/resources/jdbc.properties")){
 			property.load(fis);
 		} catch (IOException e) {
@@ -53,13 +61,13 @@ public class Test {
 			 java.sql.PreparedStatement pst=connection.prepareStatement("select * from lecturers where lecturer_id = ?")) {
 			Class.forName("com.mysql.jdbc.Driver");
 			pst.setInt(1,1);
-			SimpleStatement(connection,st,log);
-			SimplePreparedStatement(connection,pst,log);
-			SimpleCallableStatement(connection,cst,log);
+			SimpleStatement(st,log);
+			SimplePreparedStatement(pst,log);
+			SimpleCallableStatement(cst,log);
 		} catch (SQLException e) {
-			log.log(Level.ERROR,"Error");
+			log.log(Level.ERROR,"Error with error code" +  e.getErrorCode()+"." + e.getMessage());
 		} catch (ClassNotFoundException e) {
-			log.log(Level.ERROR,"Error");
+			log.log(Level.ERROR,"Error" + "." + e.getMessage());
 		}
 	}
 }

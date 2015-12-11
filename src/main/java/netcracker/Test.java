@@ -25,7 +25,7 @@ public class Test {
 			}
 		}
 		catch(SQLException e){
-			log.log(Level.ERROR,"Error with error code" +  e.getErrorCode()+"." + e.getMessage());
+			log.log(Level.ERROR,"Error with error code " +  e.getErrorCode()+"." + e.getMessage(),e);
 		}
 	}
 
@@ -37,7 +37,7 @@ public class Test {
 			}
 		}
 		catch(SQLException e){
-			log.log(Level.ERROR,"Error with error code" +  e.getErrorCode()+"." + e.getMessage());
+			log.log(Level.ERROR,"Error with error code " +  e.getErrorCode()+"." + e.getMessage(),e);
 		}
 	}
 
@@ -53,7 +53,7 @@ public class Test {
 		try (FileInputStream fis = new FileInputStream("src/main/resources/jdbc.properties")){
 			property.load(fis);
 		} catch (IOException e) {
-			log.log(Level.ERROR,"Error");
+			log.log(Level.ERROR,"Error." + e.getMessage(), e);
 		}
 		try (Connection connection = DriverManager.getConnection(url, property);
 			 Statement st=connection.createStatement();
@@ -65,9 +65,9 @@ public class Test {
 			SimplePreparedStatement(pst,log);
 			SimpleCallableStatement(cst,log);
 		} catch (SQLException e) {
-			log.log(Level.ERROR,"Error with error code" +  e.getErrorCode()+"." + e.getMessage());
+			log.log(Level.ERROR,"Error with error code " +  e.getErrorCode()+"." + e.getMessage(),e);
 		} catch (ClassNotFoundException e) {
-			log.log(Level.ERROR,"Error" + "." + e.getMessage());
+			log.log(Level.ERROR,"Error." + e.getMessage(),e);
 		}
 	}
 }

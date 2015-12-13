@@ -17,7 +17,7 @@ public class Test {
 
 	private static final Logger log=Logger.getLogger(Test.class.getName());
 
-	public static void SimpleStatement(Statement st, Logger log){
+	public static void SimpleStatement(Statement st){
 		try(ResultSet rs=st.executeQuery("select * from students")) {
 			while (rs.next()) {
 				log.log(Level.INFO, rs.getString("student_id") + " " + rs.getString("name") + " " +
@@ -29,7 +29,7 @@ public class Test {
 		}
 	}
 
-	public static void SimplePreparedStatement(java.sql.PreparedStatement pst, Logger log){
+	public static void SimplePreparedStatement(java.sql.PreparedStatement pst){
 		try(ResultSet pst_rs=pst.executeQuery()) {
 			while (pst_rs.next()) {
 				log.log(Level.INFO, pst_rs.getString("lecturer_id") + " " + pst_rs.getString("name") + " " +
@@ -41,7 +41,7 @@ public class Test {
 		}
 	}
 
-	public static void SimpleCallableStatement(CallableStatement cst, Logger log) throws SQLException {
+	public static void SimpleCallableStatement(CallableStatement cst) throws SQLException {
 		cst.registerOutParameter("count_stud",Types.INTEGER);
 		cst.execute();
 		log.log(Level.INFO,"Count of student = " + cst.getInt("count_stud"));
@@ -61,9 +61,9 @@ public class Test {
 			 java.sql.PreparedStatement pst=connection.prepareStatement("select * from lecturers where lecturer_id = ?")) {
 			Class.forName("com.mysql.jdbc.Driver");
 			pst.setInt(1,1);
-			SimpleStatement(st,log);
-			SimplePreparedStatement(pst,log);
-			SimpleCallableStatement(cst,log);
+			SimpleStatement(st);
+			SimplePreparedStatement(pst);
+			SimpleCallableStatement(cst);
 		} catch (SQLException e) {
 			log.log(Level.ERROR,"Error with error code " +  e.getErrorCode()+"." + e.getMessage(),e);
 		} catch (ClassNotFoundException e) {
